@@ -92,7 +92,12 @@ basic.forever(function () {
         determinaBoton(pulsado, andar)
         if (andar == true && step < pulsaciones.length) {
             determinaAccion(step)
+            basic.showArrow(flecha)
             myrobit.MotorRunDual(myrobit.Motors.M1, v1, myrobit.Motors.M4, v2)
+            basic.pause(1000)
+            myrobit.MotorStopAll()
+            basic.clearScreen()
+            basic.pause(500)
             step += 1
         }
     }

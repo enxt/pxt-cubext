@@ -67,6 +67,18 @@ namespace myrobit {
         }
         initialized = true
     }
+    function stopMotor(index: number) {
+        setPwm((index - 1) * 2, 0, 0)
+        setPwm((index - 1) * 2 + 1, 0, 0)
+    }
+
+//////////////////////////////////////////////////////
+
+    //% blockId=robit_motor_run block="%index |Wheel|speed %speed "
+    //% weight=85
+    //% speed.min=-100 speed.max=100
+    //% advanced=true
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
     export function MotorRun(index: Motors, speed: number): void {
         if (!initialized) {
             initPCA9685()
@@ -90,10 +102,37 @@ namespace myrobit {
             setPwm(pn, 0, -speed)
         }
     }
+
+    /**
+	 * Execute two motors at the same time
+     * @param motor_left describe parameter here, eg: 1
+	 * @param speed1 [-100-100] speed of motor; eg: 50
+	 * @param motor_right describe parameter here, eg: 2
+	 * @param speed2 [-100-100] speed of motor; eg: 50
+	*/
+    //% blockId=robit_motor_dual block="Left wheel %motor1|speed %speed1|Right wheel %motor2|speed %speed2"
+    //% weight=84
+    //% speed1.min=-100 speed1.max=100
+    //% speed2.min=-100 speed2.max=100
     export function MotorRunDual(motor_left: Motors, speed1: number, motor_right: Motors, speed2: number): void {
         speed1 = -speed1
 
         MotorRun(motor_left, speed1 / 2 * 5);   //100 map to 255
         MotorRun(motor_right, speed2 / 2 * 5);
+    }
+
+    //% blockId=robit_stop block="Motor Stop|%index|"
+    //% weight=80
+    export function MotorStop(index: Motors): void {
+        MotorRun(index, 0);
+    }
+
+    //% blockId=robit_stop_all block="Motor Stop All"
+    //% weight=79
+    //% blockGap=50
+    export function MotorStopAll(): void {
+        for (let idx = 1; idx <= 4; idx++) {
+            stopMotor(idx);
+        }
     }
 }
