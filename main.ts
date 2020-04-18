@@ -1,7 +1,6 @@
 function comenzar() {
     andar = true
     step = 0
-    music.beginMelody(music.builtInMelody(Melodies.PowerDown), MelodyOptions.Once)
 }
 function reproducirTonoPulsacion() {
     music.playTone(262, music.beat(BeatFraction.Whole))
@@ -31,36 +30,36 @@ function determinaAccion(stp: number) {
 }
 function determinaBoton(rango: number, isrunning: boolean) {
     if (isrunning == false) {
-        if (rango >= 400 && rango <= 540) {
-            pulsaciones.push("derecha")
-            basic.showArrow(ArrowNames.East)
-            reproducirTonoPulsacion()
-            basic.clearScreen()
-        } else if (rango >= 680 && rango <= 710) {
-            pulsaciones = []
-            basic.showIcon(IconNames.No)
-            reproducirTonoPulsacion()
-        } else if (rango >= 750 && rango <= 790) {
-            pulsaciones.push("abajo")
-            basic.showArrow(ArrowNames.South)
-            reproducirTonoPulsacion()
-            basic.clearScreen()
-        } else if (rango >= 820 && rango <= 835) {
-            reproducirTonoPulsacion()
-            comenzar()
-        } else if (rango >= 850 && rango <= 865) {
+        if (rango >= 645 && rango <= 656) {
             pulsaciones.push("arriba")
             basic.showArrow(ArrowNames.North)
             reproducirTonoPulsacion()
             basic.clearScreen()
-        } else if (rango >= 875 && rango <= 890) {
+        } else if (rango >= 519 && rango <= 530) {
+            pulsaciones = []
+            basic.showIcon(IconNames.No)
+            reproducirTonoPulsacion()
+        } else if (rango >= 664 && rango <= 675) {
             pulsaciones.push("izquierda")
             basic.showArrow(ArrowNames.West)
             reproducirTonoPulsacion()
             basic.clearScreen()
+        } else if (rango >= 390 && rango <= 401) {
+            pulsaciones.push("derecha")
+            basic.showArrow(ArrowNames.East)
+            reproducirTonoPulsacion()
+            basic.clearScreen()
+        } else if (rango >= 620 && rango <= 631) {
+            reproducirTonoPulsacion()
+            comenzar()
+        } else if (rango >= 582 && rango <= 595) {
+            pulsaciones.push("abajo")
+            basic.showArrow(ArrowNames.South)
+            reproducirTonoPulsacion()
+            basic.clearScreen()
         }
     } else {
-        if (rango >= 895 && rango <= 905) {
+        if (rango >= 675 && rango <= 690) {
             pausarTodo()
             reproducirTonoPulsacion()
         }
@@ -68,6 +67,15 @@ function determinaBoton(rango: number, isrunning: boolean) {
 }
 function pausarTodo() {
     andar = false
+}
+function camina() {
+    determinaAccion(step)
+    basic.showArrow(flecha)
+    myrobit.MotorRunDual(myrobit.Motors.M1, v1, myrobit.Motors.M4, v2)
+    basic.pause(1000)
+    myrobit.MotorStopAll()
+    basic.clearScreen()
+    basic.pause(500)
 }
 let pulsaciones: string[] = []
 let step = 0
@@ -77,28 +85,28 @@ let time = 0
 let v2 = 0
 let v1 = 0
 basic.showIcon(IconNames.No)
-music.beginMelody(music.builtInMelody(Melodies.PowerUp), MelodyOptions.Once)
-let pulsado = pins.analogReadPin(AnalogPin.P1)
+//music.beginMelody(music.builtInMelody(Melodies.PowerUp), MelodyOptions.Once)
+let pulsado = pins.analogReadPin(AnalogPin.P2)
 time = 10000
 flecha = -1
+radio.setGroup(88)
 basic.forever(function () {
     if (andar == false) {
-        pulsado = pins.analogReadPin(AnalogPin.P1)
+        pulsado = pins.analogReadPin(AnalogPin.P2)
         determinaBoton(pulsado, andar)
         serial.writeNumber(pulsado)
+        radio.sendNumber(pulsado)
         serial.writeLine("")
     } else {
-        pulsado = pins.analogReadPin(AnalogPin.P1)
+        pulsado = pins.analogReadPin(AnalogPin.P2)
         determinaBoton(pulsado, andar)
         if (andar == true && step < pulsaciones.length) {
-            determinaAccion(step)
-            basic.showArrow(flecha)
-            myrobit.MotorRunDual(myrobit.Motors.M1, v1, myrobit.Motors.M4, v2)
-            basic.pause(1000)
-            myrobit.MotorStopAll()
-            basic.clearScreen()
-            basic.pause(500)
+            camina()
             step += 1
+        } else if (step == pulsaciones.length) {
+            step = 0
+            andar = false
+            music.beginMelody(music.builtInMelody(Melodies.PowerDown), MelodyOptions.Once)
         }
     }
 })
